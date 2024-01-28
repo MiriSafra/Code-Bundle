@@ -78,7 +78,7 @@ static void CreateRspCommand(string outputOption, string author, bool noteOfDesc
     var commandBuilder = new System.Text.StringBuilder("bundle");
 
     if (outputOption != null)
-        commandBuilder.Append($" --output {outputOption}");
+        commandBuilder.Append($" --output {Path.GetFileName(outputOption)}");
 
     if (!string.IsNullOrEmpty(author))
         commandBuilder.Append($" --author {author}");
@@ -96,7 +96,7 @@ static void CreateRspCommand(string outputOption, string author, bool noteOfDesc
         commandBuilder.Append(" --sort");
 
     // Save the command to the response file
-    var rspFile = Path.Combine(Environment.CurrentDirectory, "response.rsp");
+    var rspFile = Path.Combine(Environment.CurrentDirectory, "response.txt");
     File.WriteAllText(rspFile, commandBuilder.ToString());
     Console.WriteLine($"Response file created successfully at '{rspFile}'.");
 }
@@ -119,7 +119,6 @@ bundleCommand.SetHandler((output, languageOption, note, removeEmptyLines, author
 #region בדיקה האם הניתוב שהכניסו תקין 
 bool ValidateOutputPath(string outputPath)
 {
-
     try
     {
         var fileInfo = new FileInfo(outputPath);
@@ -132,17 +131,13 @@ bool ValidateOutputPath(string outputPath)
 }
 
 #endregion
-
-
 #endregion
-
 #region הגדרות פקודה בסיסיות
 var rootCommand = new RootCommand("Root command for File Bundler CLI");
 rootCommand.AddCommand(bundleCommand);
 rootCommand.AddCommand(createRspCommand);
 return rootCommand.Invoke(args);
 #endregion
-
 #region סגירה כללית לקובץ
 static void BundleFiles(string outputPath, string[] files, bool note, bool removeEmptyLines, string author, bool sort, string Slanguage)
 {
@@ -170,15 +165,12 @@ static void BundleFiles(string outputPath, string[] files, bool note, bool remov
     {
         SortTheFileAccAlph(files);
     }
-
     string outputFilePath = Path.Combine(outputPath);
     List<string> allTextFiles = new List<string>();
-
     if (!string.IsNullOrEmpty(author))
     {
         allTextFiles.Add($"//---------author: {author} -----------");
     }
-
     if (Slanguage != "all")
     {
         string[] Stringlanguage = Slanguage.Split(',');
@@ -191,8 +183,6 @@ static void BundleFiles(string outputPath, string[] files, bool note, bool remov
                 currentLen[i++] = supportedLanguage;
         }
     }
-
-
     foreach (string file in files)
     {
         bool fileAdded = false;
@@ -214,13 +204,10 @@ static void BundleFiles(string outputPath, string[] files, bool note, bool remov
                     {
                         text = string.Join(Environment.NewLine, text.Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries));
                     }
-                    //allTextFiles.Add(text);
-                    //fileAdded = true;
                     break; // לאחר שהקובץ נוסף, יש לצאת מלולאה הפנימית
                 }
             }
         }
-
         if (/*!fileAdded &&*/ Slanguage == "all")
         {
             if (note)
@@ -237,10 +224,8 @@ static void BundleFiles(string outputPath, string[] files, bool note, bool remov
         }
         allTextFiles.Add(text);
     }
-
     File.WriteAllText(outputFilePath, string.Join(Environment.NewLine, allTextFiles));
     Console.WriteLine($"the files bundled successfully into {outputFilePath}");
-
 }
 #endregion
 
@@ -284,13 +269,11 @@ static string[] ExcludeFilesFromDirectories(string[] files, string[] excludedDir
             filteredFiles.Add(file);
         }
     }
-
     return filteredFiles.ToArray();
 }
 #endregion
 // Add validation functions
 #region בדיקה האם בחרו  בשפה  תקינה
-
 static bool ValidateLanguage(string language)
 {
     // Add more sophisticated validation if needed
