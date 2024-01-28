@@ -60,7 +60,14 @@ createRspCommand.AddOption(removeEmptyLines);
 #region create-rsp הגדרת הפקודה 
 createRspCommand.SetHandler((output, language, author, note, removeEmptyLines, sort) =>
 {
-    CreateRspCommand(output.FullName, author, note, removeEmptyLines, sort, language);
+    var outputPath = output?.FullName ?? PromptUser("Enter the file path to place the BUNDLE file:");
+    var languageOption = language ?? PromptUser("Enter the programming language to bundle files:");
+    var authorValue = author ?? PromptUser("Enter the name of the author:");
+    var noteOfDescriptionValue = note || PromptYesNo("Do you want to add name and path of the bundle(y\n)?");
+    var removeEmptyLinesValue = removeEmptyLines || PromptYesNo("Do you want to remove empty lines from the file?");
+    var sortValue = sort || PromptYesNo("Do you want to sort the file according to code type (default: alphabetical order)?");
+
+    CreateRspCommand(output.FullName, authorValue, noteOfDescriptionValue, removeEmptyLinesValue, sortValue, language);
     // Bundle files for a specific language
 }, outputOption, languageOption, author, noteOfDescription, removeEmptyLines, sort);
 #endregion
@@ -71,7 +78,7 @@ static void CreateRspCommand(string outputOption, string author, bool noteOfDesc
     if (string.IsNullOrEmpty(outputOption))
     {
         Console.WriteLine("file path is required");
-        outputOption = Console.ReadLine();
+        outputOption = PromptUser("Enter the file path:");
     }
 
     // Build the command based on user input
@@ -250,4 +257,19 @@ static bool ValidateLanguage(string language)
     return !string.IsNullOrEmpty(language);
 }
 #endregion
+#region Additional Methods
+static string PromptUser(string question)
+{
+    Console.Write($"{question} ");
+    return Console.ReadLine();
+}
+
+static bool PromptYesNo(string question)
+{
+    Console.Write($"{question} (yes/no): ");
+    var response = Console.ReadLine()?.ToLower();
+    return response == "yes" || response == "y";
+}
+    #endregion
+
 
