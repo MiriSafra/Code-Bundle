@@ -132,12 +132,14 @@ bool ValidateOutputPath(string outputPath)
 
 #endregion
 #endregion
+
 #region הגדרות פקודה בסיסיות
 var rootCommand = new RootCommand("Root command for File Bundler CLI");
 rootCommand.AddCommand(bundleCommand);
 rootCommand.AddCommand(createRspCommand);
 return rootCommand.Invoke(args);
 #endregion
+
 #region סגירה כללית לקובץ
 static void BundleFiles(string outputPath, string[] files, bool note, bool removeEmptyLines, string author, bool sort, string Slanguage)
 {
@@ -153,10 +155,6 @@ static void BundleFiles(string outputPath, string[] files, bool note, bool remov
         new Lan("c++", ".cpp"),
         new Lan("c", ".c")
     };
-
-    // Exclude files from specific directories (e.g., bin, debug, etc.)
-    files = ExcludeFilesFromDirectories(files, new string[] { "bin", "obj", "debug" });
-
     if (sort)
     {
         SortTheFileAccCode(files);
@@ -192,7 +190,7 @@ static void BundleFiles(string outputPath, string[] files, bool note, bool remov
             
             foreach (Lan item in currentLen)
             {
-                if (file.EndsWith(item.FileExtension))
+                if (item != null && file.EndsWith(item.FileExtension))
                 {
                     if (note)
                     {
@@ -208,7 +206,7 @@ static void BundleFiles(string outputPath, string[] files, bool note, bool remov
                 }
             }
         }
-        if (/*!fileAdded &&*/ Slanguage == "all")
+        if (Slanguage == "all")
         {
             if (note)
             {
@@ -244,34 +242,6 @@ static string[] SortTheFileAccCode(string[] files)
 }
 #endregion
 
-#region הכנסה לקובץ התגובה רק קבצים שהם קבצי קוד
-static string[] ExcludeFilesFromDirectories(string[] files, string[] excludedDirectories)
-{
-    List<string> filteredFiles = new List<string>();
-
-    foreach (string file in files)
-    {
-        // Check if the file is not in any of the excluded directories
-        string directory = Path.GetDirectoryName(file).ToLower();
-        bool excludeFile = false;
-
-        foreach (string excludedDirectory in excludedDirectories)
-        {
-            if (directory.Contains(excludedDirectory.ToLower()))
-            {
-                excludeFile = true;
-                break;
-            }
-        }
-
-        if (!excludeFile)
-        {
-            filteredFiles.Add(file);
-        }
-    }
-    return filteredFiles.ToArray();
-}
-#endregion
 // Add validation functions
 #region בדיקה האם בחרו  בשפה  תקינה
 static bool ValidateLanguage(string language)
